@@ -18,7 +18,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.client_socket.connect(('192.168.77.10', 12345))
 
         self.host_ip = self.client_socket.getsockname()[0]
-
+        host_ip = "192.168.77.10"
         # Mesajları almak için iş parçacığını başlat
         self.receive_thread = threading.Thread(target=self.receive_messages)
         self.receive_thread.daemon = True
@@ -76,7 +76,7 @@ class MainWindow(QtWidgets.QMainWindow):
                 if message:
                     # Mesajı textEdit widget'ına ekle
                     #if the sender has the server ip, display the message in red
-                    if(self.client_socket.getpeername()[0] == self.host_ip):
+                    if(self.host_ip == self.client_socket.getsockname()[0]):
                         self.ui.textEdit.append(f"<font color='red'> Server: {message}</font>")
 
 
