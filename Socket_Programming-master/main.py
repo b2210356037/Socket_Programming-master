@@ -2,7 +2,7 @@ import sys
 import socket
 import threading
 from PyQt5 import QtWidgets, QtCore
-from ui_interface import Ui_MainWindow  # PyQt5 GUI dosyanızın adı
+from interface_ui import Ui_MainWindow  # PyQt5 GUI dosyanızın adı
 
 
 class MainWindow(QtWidgets.QMainWindow):
