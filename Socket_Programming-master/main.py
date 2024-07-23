@@ -24,6 +24,10 @@ class MainWindow(QtWidgets.QMainWindow):
         self.receive_thread.daemon = True
         self.receive_thread.start()
 
+<<<<<<< HEAD
+=======
+    
+>>>>>>> e02d1970ded7e7f7cf3d08acca3a658ff1d11ab5
         # Zamanlayıcı oluştur ve her 1000 ms (1 saniye) aralıklarla updateDateTime metodunu çağır
         self.timer = QtCore.QTimer()
         self.timer.timeout.connect(self.updateDateTime)
@@ -32,7 +36,7 @@ class MainWindow(QtWidgets.QMainWindow):
     def setupConnections(self):
         # Button'lara tıklama olaylarını bağlıyoruz
         self.ui.pushButton.clicked.connect(self.handlePushButtonClick)
-        self.ui.pushButton_2.clicked.connect(self.handlePushButton2Click)
+        self.ui.pushButton_3.clicked.connect(self.clearTextEdit)
 
     def initializeDateTime(self):
         # Mevcut tarihi ve saati al ve widget'lara ata
@@ -56,23 +60,31 @@ class MainWindow(QtWidgets.QMainWindow):
         # Kullanıcıdan gelen mesajı al
         user_message = self.ui.lineEdit_2.text()
 
-        # Düğmeye tıklanmasıyla bu fonksiyon çalışır
-        QtWidgets.QMessageBox.information(self, "Button Clicked", "Your message is sent!")
-
         # Mesajı textEdit widget'ına ekle
         self.ui.textEdit.append(f"{self.host_ip}: {user_message}")
 
+<<<<<<< HEAD
         # Mesajı TCP sunucusuna gönder
         self.client_socket.sendall(f"{self.host_ip}: {user_message}".encode())
+=======
+        # Mesajı TCP sunucusuna gönder   
+        self.client_socket.sendall(user_message.encode())
+>>>>>>> e02d1970ded7e7f7cf3d08acca3a658ff1d11ab5
 
         # LineEdit widget'ını temizle
         self.ui.lineEdit_2.clear()
 
+<<<<<<< HEAD
     def handlePushButton2Click(self):
         # İkinci düğmeye tıklanmasıyla bu fonksiyon çalışır
         QtWidgets.QMessageBox.information(self, "Button Clicked", "Cancel Button Clicked!")
 
     def receive_messages(self):
+=======
+    
+   
+    def receive_messages(self):   
+>>>>>>> e02d1970ded7e7f7cf3d08acca3a658ff1d11ab5
         while True:
             try:
                 message = self.client_socket.recv(1024).decode()
@@ -92,6 +104,11 @@ class MainWindow(QtWidgets.QMainWindow):
                     break
             except:
                 break
+    def clearTextEdit(self):
+        # textEdit widget'ını temizle
+        self.ui.textEdit.clear()
+          
+            
 
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
