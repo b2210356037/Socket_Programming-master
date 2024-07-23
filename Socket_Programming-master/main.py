@@ -13,16 +13,17 @@ class MainWindow(QtWidgets.QMainWindow):
         self.setupConnections()
         self.initializeDateTime()
 
-        #Tcp bağlantısı başlatma(new)
-        self.client_socket=socket.socket(socket.AF_INET,socket.SOCK_STREAM)
-        self.client_socket.connect(('192.168.77.10',12345))
+        # Tcp bağlantısı başlatma
+        self.client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.client_socket.connect(('192.168.77.10', 12345))
 
-        # Mesajları almak için iş parçacığını başlat(new)
+        self.host_ip = self.client_socket.getsockname()[0]
+
+        # Mesajları almak için iş parçacığını başlat
         self.receive_thread = threading.Thread(target=self.receive_messages)
         self.receive_thread.daemon = True
         self.receive_thread.start()
-        
-    
+
         # Zamanlayıcı oluştur ve her 1000 ms (1 saniye) aralıklarla updateDateTime metodunu çağır
         self.timer = QtCore.QTimer()
         self.timer.timeout.connect(self.updateDateTime)
@@ -59,26 +60,34 @@ class MainWindow(QtWidgets.QMainWindow):
         QtWidgets.QMessageBox.information(self, "Button Clicked", "Your message is sent!")
 
         # Mesajı textEdit widget'ına ekle
-        self.ui.textEdit.append(user_message)
+        self.ui.textEdit.append(f"{self.host_ip}: {user_message}")
 
-        # Mesajı TCP sunucusuna gönder   new
-        self.client_socket.sendall(user_message.encode())
+        # Mesajı TCP sunucusuna gönder
+        self.client_socket.sendall(f"{self.host_ip}: {user_message}".encode())
 
         # LineEdit widget'ını temizle
         self.ui.lineEdit_2.clear()
 
-        
     def handlePushButton2Click(self):
         # İkinci düğmeye tıklanmasıyla bu fonksiyon çalışır
         QtWidgets.QMessageBox.information(self, "Button Clicked", "Cancel Button Clicked!")
-   
-    def receive_messages(self):   #new
+
+    def receive_messages(self):
         while True:
             try:
                 message = self.client_socket.recv(1024).decode()
                 if message:
                     # Mesajı textEdit widget'ına ekle
-                    self.ui.textEdit.append(f"Server: {message}")
+                    #if the sender has the server ip, display the message in red
+                    if(self.client_socket.getpeername()[0] == self.host_ip):
+                        self.ui.textEdit.append(f"<font color='red'> Server: {message}</font>")
+
+
+                    # if message.startswith("Server:"):
+                    #     self.ui.textEdit.append(f"<font color='red'>{message}</font>")
+                    else:
+                        self.ui.textEdit.append(message)
+                    #self.ui.textEdit.append(message)
                 else:
                     break
             except:
