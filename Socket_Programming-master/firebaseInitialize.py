@@ -1,3 +1,5 @@
+
+  #initialize firebase
 # firebase.py
 
 import os
