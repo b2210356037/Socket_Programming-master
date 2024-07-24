@@ -4,6 +4,9 @@ import threading
 from PyQt5 import QtWidgets, QtCore
 from PyQt5.QtCore import QLocale
 from interface_ui import Ui_MainWindow  # Your PyQt5 GUI file name
+from firebaseInitialize import *
+from dotenv import load_dotenv
+from firebase_admin import firestore 
 
 class MainWindow(QtWidgets.QMainWindow):
     def __init__(self):
@@ -62,6 +65,7 @@ class MainWindow(QtWidgets.QMainWindow):
         locale = QLocale(QLocale.English, QLocale.UnitedStates)
         formatted_date = locale.toString(date, QLocale.LongFormat)
         QtWidgets.QMessageBox.information(self, "Selected Date", formatted_date)
+        #initialize firebase database
 
     def handlePushButtonClick(self):
         # Get the message from the user
@@ -73,8 +77,39 @@ class MainWindow(QtWidgets.QMainWindow):
         # Send the message to the TCP server
         self.client_socket.sendall(f"{self.host_ip}: {user_message}".encode())
 
+        # Prepare the log entry
+        log_entry = {
+            'date': QtCore.QDate.currentDate().toString("yyyy-MM-dd"),
+            'log': f"{self.host_ip}: {user_message}"
+        }
+
+        # Get the current date as the document ID
+        document_id = QtCore.QDate.currentDate().toString("yyyy-MM-dd")
+
+        # Reference to the document
+        doc_ref = db.collection('logs').document(document_id)
+
+        # Fetch the existing document
+        doc = doc_ref.get()
+        if doc.exists:
+            # Document exists, update the existing log entry
+            existing_data = doc.to_dict()
+            existing_logs = existing_data.get('logs', [])
+            existing_logs.append(log_entry['log'])
+            doc_ref.update({
+                'logs': existing_logs
+            })
+        else:
+            # Document does not exist, create a new document
+            doc_ref.set({
+                'date': log_entry['date'],
+                'logs': [log_entry['log']]
+            })
+
         # Clear the lineEdit widget
         self.ui.lineEdit_2.clear()
+
+
 
     def handlePushButton2Click(self):
         # This function is called when the second button is clicked
