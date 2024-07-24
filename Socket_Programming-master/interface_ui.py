@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+# -- coding: utf-8 --
 
 # Form implementation generated from reading ui file 'c:\Users\iclal\Desktop\chatbot\Socket_Programming-master\Socket_Programming-master\interface.ui'
 #

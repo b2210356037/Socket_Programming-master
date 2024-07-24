@@ -1,12 +1,24 @@
+import datetime
 import socket
 from _thread import *
 import threading
+
+import sys
+import socket
+import threading
+from PyQt5 import QtWidgets, QtCore
+from PyQt5.QtCore import QLocale
+from interface_ui import Ui_MainWindow  # Your PyQt5 GUI file name
+from firebaseInitialize import *
+from dotenv import load_dotenv
+from firebase_admin import firestore 
 
 print_lock = threading.Lock()
 clients = []  # List of client sockets
 clients_lock = threading.Lock()  # Lock for managing clients
 
 # Function to send messages to clients
+# Function to send messages to all clients
 def send_to_all_clients(message):
     with clients_lock:
         if message == "exit":
@@ -25,6 +37,35 @@ def send_to_all_clients(message):
                     print(f"Error sending message to client: {e}")
                     client.close()
                     remove(client)
+
+            # Add the message to Firestore logs
+            log_entry = {
+                'date': datetime.now().strftime("%Y-%m-%d"),
+                'log': f"Server: {message}"
+            }
+
+            # Get the current date as the document ID
+            document_id = log_entry['date']
+
+            # Reference to the document
+            doc_ref = db.collection('logs').document(document_id)
+
+            # Fetch the existing document
+            doc = doc_ref.get()
+            if doc.exists:
+                # Document exists, update the existing log entry
+                existing_data = doc.to_dict()
+                existing_logs = existing_data.get('logs', [])
+                existing_logs.append(log_entry['log'])
+                doc_ref.update({
+                    'logs': existing_logs
+                })
+            else:
+                # Document does not exist, create a new document
+                doc_ref.set({
+                    'date': log_entry['date'],
+                    'logs': [log_entry['log']]
+                })
 
 #remove clients
 def remove(connection):
