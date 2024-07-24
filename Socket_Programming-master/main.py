@@ -6,7 +6,7 @@ import os
 from dotenv import load_dotenv
 from PyQt5 import QtWidgets, QtCore
 from PyQt5.QtCore import QLocale
-from interface_ui import Ui_MainWindow  # PyQt5 GUI dosya adınız
+from interface_ui import Ui_MainWindow  # Your PyQt5 GUI file name
 
 load_dotenv()
 
@@ -18,99 +18,97 @@ class MainWindow(QtWidgets.QMainWindow):
         self.setupConnections()
         self.initializeDateTime()
 
-        # Takvim widget'ını İngilizce olarak ayarla
+        # Set the calendar widget to English
         self.ui.calendarWidget.setLocale(QLocale(QLocale.English, QLocale.UnitedStates))
     
-        # TCP bağlantısını başlat
+        # Start TCP connection
         self.client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.client_socket.connect(('192.168.77.10', 12345))
 
         self.host_ip = self.client_socket.getsockname()[0]
 
-        # Mesajları almak için bir thread başlat
+        # Start a thread to receive messages
         self.receive_thread = threading.Thread(target=self.receive_messages)
         self.receive_thread.daemon = True
         self.receive_thread.start()
 
-        # Timer oluştur ve updateDateTime metodunu her 1000 ms (1 saniye) çağır
+        # Create a timer and call updateDateTime method every 1000 ms (1 second)
         self.timer = QtCore.QTimer()
         self.timer.timeout.connect(self.updateDateTime)
-        self.timer.start(1000)  # Her 1 saniye
+        self.timer.start(1000)  # Every 1 second
 
-        # Google Generative AI modelini yapılandır
+        # Configure the Google Generative AI model
         self.configureGenerativeAI()
 
     def setupConnections(self):
-        # Buton tıklamalarını ilgili işleyicilere bağla
+        # Connect button clicks to their respective handlers
         self.ui.pushButton.clicked.connect(self.handlePushButtonClick)
-        # Takvim widget'ının tıklama sinyalini show_date metoduna bağla
+        # Connect the calendar widget's clicked signal to show_date method
         self.ui.calendarWidget.clicked.connect(self.show_date)
-        # AI ile içerik üretme butonunu bağla
+        # Connect button for generating content with AI
         self.ui.pushButton_2.clicked.connect(self.handlePushButton2Click)
 
     def initializeDateTime(self):
-        # Şu anki tarih ve saati al ve widget'lara ayarla
+        # Get the current date and time and set them to the widgets
         current_time = QtCore.QTime.currentTime()
         current_date = QtCore.QDate.currentDate()
 
-        # Tarih ve saati widget'lara ayarla
+        # Set date and time to widgets
         self.ui.timeEdit.setTime(current_time)
         self.ui.dateEdit.setDate(current_date)
 
     def updateDateTime(self):
-        # Şu anki tarih ve saati al ve widget'lara ayarla
+        # Get the current date and time and set them to the widgets
         current_time = QtCore.QTime.currentTime()
         current_date = QtCore.QDate.currentDate()
 
-        # Tarih ve saati widget'lara ayarla
+        # Set date and time to widgets
         self.ui.timeEdit.setTime(current_time)
         self.ui.dateEdit.setDate(current_date)
 
     def show_date(self, date):
-        # Tarihi İngilizce formatta mesaj kutusunda göster
+        # Display the date in English format in a message box
         locale = QLocale(QLocale.English, QLocale.UnitedStates)
         formatted_date = locale.toString(date, QLocale.LongFormat)
-        QtWidgets.QMessageBox.information(self, "Seçilen Tarih", formatted_date)
+        QtWidgets.QMessageBox.information(self, "Selected Date", formatted_date)
 
     def handlePushButtonClick(self):
-        # Kullanıcıdan mesajı al
+        # Get the message from the user
         user_message = self.ui.lineEdit_2.text()
 
-        # Mesajı textEdit widget'ına ekle
+        # Add the message to the textEdit widget
         self.ui.textEdit.append(f"{self.host_ip}: {user_message}")
 
-        # Mesajı TCP sunucusuna gönder
+        # Send the message to the TCP server
         self.client_socket.sendall(f"{self.host_ip}: {user_message}".encode())
 
-        # lineEdit widget'ını temizle
+        # Clear the lineEdit widget
         self.ui.lineEdit_2.clear()
 
-
-
     def handlePushButton2Click(self):
-        # AI ile sohbet etme
-        user_prompt = self.ui.lineEdit_2.text()  # Kullanıcının AI'ye göndermek istediği mesajı al
+        # Chat with AI
+        user_prompt = self.ui.lineEdit_2.text()  # Get the message to send to AI from the user
         if user_prompt:
             try:
                 response = self.model.generate_content(user_prompt)
-                # AI'dan gelen yanıtı textEdit widget'ına yazdır
-                self.ui.textEdit.append(f"AI Yanıtı: {response.text}")
+                # Add the AI response to the textEdit widget
+                self.ui.textEdit.append(f"AI Response: {response.text}")
             except Exception as e:
-                QtWidgets.QMessageBox.critical(self, "AI Hatası", f"AI yanıtı alınamadı: {e}")
-            # lineEdit widget'ını temizle
+                QtWidgets.QMessageBox.critical(self, "AI Error", f"AI response not received: {e}")
+            # Clear the lineEdit widget
             self.ui.lineEdit_2.clear()
         else:
-            QtWidgets.QMessageBox.warning(self, "Boş Mesaj", "AI'ye gönderilecek bir mesaj girin.")
+            QtWidgets.QMessageBox.warning(self, "Empty Message", "Enter a message to send to AI.")
 
     def receive_messages(self):
         while True:
             try:
                 message = self.client_socket.recv(1024).decode()
                 if message:
-                    # Mesajı textEdit widget'ına ekle
-                    # Gönderen sunucu IP'si ise mesajı kırmızı olarak göster
+                    # Add the message to the textEdit widget
+                    # If the sender has the server IP, display the message in red
                     if self.host_ip == self.client_socket.getsockname()[0]:
-                        self.ui.textEdit.append(f"<font color='red'> Sunucu: {message}</font>")
+                        self.ui.textEdit.append(f"<font color='red'> Server: {message}</font>")
                     else:
                         self.ui.textEdit.append(message)
                 else:
@@ -119,14 +117,14 @@ class MainWindow(QtWidgets.QMainWindow):
                 break
 
     def configureGenerativeAI(self):
-        # API anahtarını ortam değişkenlerinden yapılandır
+        # Configure the API key from environment variables
         api_key = os.getenv("GOOGLE_APIKEY")
         if api_key:
             genai.configure(api_key=os.environ["GOOGLE_APIKEY"])
-            # Belirtilen model ID'si ile bir GenerativeModel örneği oluştur
+            # Create a GenerativeModel instance with the specified model ID
             self.model = genai.GenerativeModel('gemini-1.0-pro-latest')
         else:
-            QtWidgets.QMessageBox.critical(self, "API Anahtar Hatası", "GOOGLE_API_KEY ortam değişkeni tanımlı değil.")
+            QtWidgets.QMessageBox.critical(self, "API Key Error", "GOOGLE_API_KEY environment variable is not set.")
 
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
