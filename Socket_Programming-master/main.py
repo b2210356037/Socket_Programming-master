@@ -2,6 +2,7 @@ import sys
 import socket
 import threading
 from PyQt5 import QtWidgets, QtCore
+from PyQt5.QtCore import QLocale
 from interface_ui import Ui_MainWindow  # PyQt5 GUI dosyanızın adı
 
 
@@ -12,6 +13,11 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.setupUi(self)
         self.setupConnections()
         self.initializeDateTime()
+
+
+        # Takvim widget'ını İngilizceye ayarlama
+        self.ui.calendarWidget.setLocale(QLocale(QLocale.English, QLocale.UnitedStates))
+    
 
         # Tcp bağlantısı başlatma
         self.client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -32,7 +38,9 @@ class MainWindow(QtWidgets.QMainWindow):
     def setupConnections(self):
         # Button'lara tıklama olaylarını bağlıyoruz
         self.ui.pushButton.clicked.connect(self.handlePushButtonClick)
-        self.ui.pushButton_3.clicked.connect(self.clearTextEdit)
+        # Calendar widget'ın tıklama sinyalini show_date metoduna bağlıyoruz
+        self.ui.calendarWidget.clicked.connect(self.show_date)
+        
 
     def initializeDateTime(self):
         # Mevcut tarihi ve saati al ve widget'lara ata
@@ -51,6 +59,11 @@ class MainWindow(QtWidgets.QMainWindow):
         # Widget'lara tarih ve saat atama
         self.ui.timeEdit.setTime(current_time)
         self.ui.dateEdit.setDate(current_date)
+
+    def show_date(self, date):
+    # Tarihi QDate tipinde alıp bir mesaj kutusunda gösterme
+     QtWidgets.QMessageBox.information(self, "Selected Date", date.toString())
+
 
     def handlePushButtonClick(self):
         # Kullanıcıdan gelen mesajı al
@@ -89,9 +102,7 @@ class MainWindow(QtWidgets.QMainWindow):
                     break
             except:
                 break
-    def clearTextEdit(self):
-        # textEdit widget'ını temizle
-        self.ui.textEdit.clear()
+    
           
             
 
