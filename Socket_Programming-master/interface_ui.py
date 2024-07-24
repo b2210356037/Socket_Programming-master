@@ -1,4 +1,4 @@
-# -- coding: utf-8 --
+# -*- coding: utf-8 -*-
 
 # Form implementation generated from reading ui file 'c:\Users\iclal\Desktop\chatbot\Socket_Programming-master\Socket_Programming-master\interface.ui'
 #
@@ -100,12 +100,12 @@ class Ui_MainWindow(object):
         self.horizontalLayout_2.addWidget(self.pushButton_2)
         self.scrollArea_2.setWidget(self.scrollAreaWidgetContents_2)
         self.frame = QtWidgets.QFrame(self.scrollAreaWidgetContents)
-        self.frame.setGeometry(QtCore.QRect(480, 110, 351, 341))
+        self.frame.setGeometry(QtCore.QRect(480, 110, 391, 341))
         self.frame.setFrameShape(QtWidgets.QFrame.StyledPanel)
         self.frame.setFrameShadow(QtWidgets.QFrame.Raised)
         self.frame.setObjectName("frame")
         self.calendarWidget = QtWidgets.QCalendarWidget(self.frame)
-        self.calendarWidget.setGeometry(QtCore.QRect(30, 30, 281, 271))
+        self.calendarWidget.setGeometry(QtCore.QRect(30, 30, 351, 271))
         self.calendarWidget.setDateEditEnabled(True)
         self.calendarWidget.setObjectName("calendarWidget")
         self.scrollArea.setWidget(self.scrollAreaWidgetContents)
