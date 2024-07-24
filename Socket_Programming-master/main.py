@@ -85,6 +85,8 @@ class MainWindow(QtWidgets.QMainWindow):
         # lineEdit widget'ını temizle
         self.ui.lineEdit_2.clear()
 
+
+
     def handlePushButton2Click(self):
         # AI ile sohbet etme
         user_prompt = self.ui.lineEdit_2.text()  # Kullanıcının AI'ye göndermek istediği mesajı al
