@@ -61,8 +61,10 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.dateEdit.setDate(current_date)
 
     def show_date(self, date):
-    # Tarihi QDate tipinde alıp bir mesaj kutusunda gösterme
-     QtWidgets.QMessageBox.information(self, "Selected Date", date.toString())
+    # Tarihi QDate tipinde alıp İngilizce formatında bir mesaj kutusunda gösterme
+     locale = QLocale(QLocale.English, QLocale.UnitedStates)
+     formatted_date = locale.toString(date, QLocale.LongFormat)
+     QtWidgets.QMessageBox.information(self, "Selected Date", formatted_date)
 
 
     def handlePushButtonClick(self):
