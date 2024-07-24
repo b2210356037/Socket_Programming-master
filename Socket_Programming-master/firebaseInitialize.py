@@ -1,14 +1,20 @@
 #initialize firebase
+import os
 import firebase_admin
 from firebase_admin import credentials
 from firebase_admin import db
+from dotenv import load_dotenv
 
-# Path to your service account key
-cred = credentials.Certificate('FIREBASE_SERVICE_ACCOUNT_KEY_PATH')
+# Load environment variables from .env file
+load_dotenv()
+
+# Path to your service account key from environment variable
+cred_path = os.getenv('FIREBASE_SERVICE_ACCOUNT_KEY_PATH')
+cred = credentials.Certificate(cred_path)
 
 # Initialize the app with a service account, granting admin privileges
 firebase_admin.initialize_app(cred, {
-    'databaseURL': 'FIREBASE_DATABASE_URL'
+    'databaseURL': os.getenv('FIREBASE_DATABASE_URL')
 })
 
 ref = db.reference('Logs')
@@ -19,12 +25,11 @@ ref.set({
     'log': 'This is a test log'
 })
 
-#read data from firebase
+# Read data from firebase
 data = ref.get()
 print(data)
 
-#update data in firebase
+# Update data in firebase
 ref.update({
     'log': 'This is an updated log'
 })
-
