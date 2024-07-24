@@ -13,7 +13,7 @@ from firebaseInitialize import *
 from dotenv import load_dotenv
 from firebase_admin import firestore 
 
-import datetime
+from datetime import datetime
 
 print_lock = threading.Lock()
 clients = []  # List of client sockets

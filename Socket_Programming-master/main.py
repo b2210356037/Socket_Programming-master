@@ -75,9 +75,23 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.dateEdit.setDate(current_date)
 
     def show_date(self, date):
-        # Display the date in English format in a message box
+        # Display the total log entries for the selected date
         locale = QLocale(QLocale.English, QLocale.UnitedStates)
         formatted_date = locale.toString(date, QLocale.LongFormat)
+
+        try:
+            # Get the document ID
+            document_id = date.toString("yyyy-MM-dd")
+            
+            # Reference to the document
+            doc_ref = db.collection('logs').document(document_id)
+
+            for log in doc_ref.get().to_dict().get('logs', []):
+                self.ui.textEdit.append(log)
+
+        except Exception as e:
+            QtWidgets.QMessageBox.critical(self, "Error", f"Error fetching logs: {e}")
+
         QtWidgets.QMessageBox.information(self, "Selected Date", formatted_date)
 
     def handlePushButtonClick(self):
