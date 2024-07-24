@@ -1,4 +1,4 @@
-# -- coding: utf-8 --
+# -*- coding: utf-8 -*-
 
 # Form implementation generated from reading ui file 'c:\Users\iclal\Desktop\chatbot\Socket_Programming-master\Socket_Programming-master\interface.ui'
 #
@@ -14,9 +14,9 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(959, 711)
+        MainWindow.resize(1057, 702)
         self.scrollArea = QtWidgets.QScrollArea(MainWindow)
-        self.scrollArea.setGeometry(QtCore.QRect(10, 20, 931, 651))
+        self.scrollArea.setGeometry(QtCore.QRect(60, 20, 931, 651))
         self.scrollArea.setWidgetResizable(True)
         self.scrollArea.setObjectName("scrollArea")
         self.scrollAreaWidgetContents = QtWidgets.QWidget()
@@ -86,17 +86,26 @@ class Ui_MainWindow(object):
         self.textEdit.setFrameShape(QtWidgets.QFrame.StyledPanel)
         self.textEdit.setReadOnly(True)
         self.textEdit.setObjectName("textEdit")
-        self.pushButton_3 = QtWidgets.QPushButton(self.scrollAreaWidgetContents_2)
-        self.pushButton_3.setGeometry(QtCore.QRect(310, 260, 75, 23))
+        self.horizontalLayoutWidget_2 = QtWidgets.QWidget(self.scrollAreaWidgetContents_2)
+        self.horizontalLayoutWidget_2.setGeometry(QtCore.QRect(230, 249, 160, 61))
+        self.horizontalLayoutWidget_2.setObjectName("horizontalLayoutWidget_2")
+        self.horizontalLayout_2 = QtWidgets.QHBoxLayout(self.horizontalLayoutWidget_2)
+        self.horizontalLayout_2.setContentsMargins(0, 0, 0, 0)
+        self.horizontalLayout_2.setObjectName("horizontalLayout_2")
+        self.pushButton_3 = QtWidgets.QPushButton(self.horizontalLayoutWidget_2)
         self.pushButton_3.setObjectName("pushButton_3")
+        self.horizontalLayout_2.addWidget(self.pushButton_3)
+        self.pushButton_2 = QtWidgets.QPushButton(self.horizontalLayoutWidget_2)
+        self.pushButton_2.setObjectName("pushButton_2")
+        self.horizontalLayout_2.addWidget(self.pushButton_2)
         self.scrollArea_2.setWidget(self.scrollAreaWidgetContents_2)
         self.frame = QtWidgets.QFrame(self.scrollAreaWidgetContents)
-        self.frame.setGeometry(QtCore.QRect(540, 120, 351, 341))
+        self.frame.setGeometry(QtCore.QRect(480, 110, 351, 341))
         self.frame.setFrameShape(QtWidgets.QFrame.StyledPanel)
         self.frame.setFrameShadow(QtWidgets.QFrame.Raised)
         self.frame.setObjectName("frame")
         self.calendarWidget = QtWidgets.QCalendarWidget(self.frame)
-        self.calendarWidget.setGeometry(QtCore.QRect(41, 29, 281, 271))
+        self.calendarWidget.setGeometry(QtCore.QRect(30, 30, 281, 271))
         self.calendarWidget.setDateEditEnabled(True)
         self.calendarWidget.setObjectName("calendarWidget")
         self.scrollArea.setWidget(self.scrollAreaWidgetContents)
@@ -119,3 +128,4 @@ class Ui_MainWindow(object):
 "</style></head><body style=\" font-family:\'MS Shell Dlg 2\'; font-size:8.25pt; font-weight:400; font-style:normal;\">\n"
 "<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'Segoe UI\'; font-size:9pt;\">CHAT FLOW</span></p></body></html>"))
         self.pushButton_3.setText(_translate("MainWindow", "Clean"))
+        self.pushButton_2.setText(_translate("MainWindow", "Gemini AI"))
