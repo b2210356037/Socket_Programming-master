@@ -16,7 +16,7 @@ class Ui_MainWindow(object):
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(959, 711)
         self.scrollArea = QtWidgets.QScrollArea(MainWindow)
-        self.scrollArea.setGeometry(QtCore.QRect(20, 30, 931, 651))
+        self.scrollArea.setGeometry(QtCore.QRect(10, 20, 931, 651))
         self.scrollArea.setWidgetResizable(True)
         self.scrollArea.setObjectName("scrollArea")
         self.scrollAreaWidgetContents = QtWidgets.QWidget()
@@ -83,6 +83,7 @@ class Ui_MainWindow(object):
         self.scrollAreaWidgetContents_2.setObjectName("scrollAreaWidgetContents_2")
         self.textEdit = QtWidgets.QTextEdit(self.scrollAreaWidgetContents_2)
         self.textEdit.setGeometry(QtCore.QRect(10, 10, 381, 231))
+        self.textEdit.setFrameShape(QtWidgets.QFrame.StyledPanel)
         self.textEdit.setReadOnly(True)
         self.textEdit.setObjectName("textEdit")
         self.pushButton_3 = QtWidgets.QPushButton(self.scrollAreaWidgetContents_2)
@@ -101,6 +102,8 @@ class Ui_MainWindow(object):
         self.scrollArea.setWidget(self.scrollAreaWidgetContents)
 
         self.retranslateUi(MainWindow)
+        self.pushButton_3.clicked.connect(self.textEdit.clear) # type: ignore
+        self.calendarWidget.clicked['QDate'].connect(MainWindow.show) # type: ignore
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
     def retranslateUi(self, MainWindow):
