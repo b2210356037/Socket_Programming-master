@@ -3,10 +3,17 @@ import socket
 import threading
 import google.generativeai as genai
 import os
-from dotenv import load_dotenv
+from google.cloud import firestore
+
+import sys
+import socket
+import threading
 from PyQt5 import QtWidgets, QtCore
 from PyQt5.QtCore import QLocale
-from interface_ui import Ui_MainWindow  # PyQt5 GUI dosya adınız
+from interface_ui import Ui_MainWindow  # Your PyQt5 GUI file name
+from firebaseInitialize import *
+from dotenv import load_dotenv
+from firebase_admin import firestore 
 
 load_dotenv()
 
@@ -73,16 +80,45 @@ class MainWindow(QtWidgets.QMainWindow):
         QtWidgets.QMessageBox.information(self, "Seçilen Tarih", formatted_date)
 
     def handlePushButtonClick(self):
-        # Kullanıcıdan mesajı al
+        # Get the message from the user
         user_message = self.ui.lineEdit_2.text()
 
-        # Mesajı textEdit widget'ına ekle
+        # Add the message to the textEdit widget
         self.ui.textEdit.append(f"{self.host_ip}: {user_message}")
 
-        # Mesajı TCP sunucusuna gönder
+        # Send the message to the TCP server
         self.client_socket.sendall(f"{self.host_ip}: {user_message}".encode())
 
-        # lineEdit widget'ını temizle
+        # Prepare the log entry
+        log_entry = {
+            'date': QtCore.QDate.currentDate().toString("yyyy-MM-dd"),
+            'log': f"{self.host_ip}: {user_message}"
+        }
+
+        # Get the current date as the document ID
+        document_id = QtCore.QDate.currentDate().toString("yyyy-MM-dd")
+
+        # Reference to the document
+        doc_ref = db.collection('logs').document(document_id)
+
+        # Fetch the existing document
+        doc = doc_ref.get()
+        if doc.exists:
+            # Document exists, update the existing log entry
+            existing_data = doc.to_dict()
+            existing_logs = existing_data.get('logs', [])
+            existing_logs.append(log_entry['log'])
+            doc_ref.update({
+                'logs': existing_logs
+            })
+        else:
+            # Document does not exist, create a new document
+            doc_ref.set({
+                'date': log_entry['date'],
+                'logs': [log_entry['log']]
+            })
+
+        # Clear the lineEdit widget
         self.ui.lineEdit_2.clear()
 
 
