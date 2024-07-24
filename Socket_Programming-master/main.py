@@ -160,7 +160,7 @@ class MainWindow(QtWidgets.QMainWindow):
         if api_key:
             genai.configure(api_key=os.environ["GOOGLE_APIKEY"])
             # Create a GenerativeModel instance with the specified model ID
-            self.model = genai.GenerativeModel('gemini-1.0-pro-latest')
+            self.model = genai.GenerativeModel('gemini-1.5-pro')
         else:
             QtWidgets.QMessageBox.critical(self, "API Key Error", "GOOGLE_API_KEY environment variable is not set.")
 
