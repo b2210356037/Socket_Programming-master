@@ -1,4 +1,4 @@
-# -- coding: utf-8 --
+# -*- coding: utf-8 -*-
 
 # Form implementation generated from reading ui file 'c:\Users\iclal\Desktop\chatbot\Socket_Programming-master\Socket_Programming-master\interface.ui'
 #
@@ -108,6 +108,9 @@ class Ui_MainWindow(object):
         self.calendarWidget.setGeometry(QtCore.QRect(30, 30, 351, 271))
         self.calendarWidget.setDateEditEnabled(True)
         self.calendarWidget.setObjectName("calendarWidget")
+        self.comboBox = QtWidgets.QComboBox(self.scrollAreaWidgetContents)
+        self.comboBox.setGeometry(QtCore.QRect(370, 80, 69, 22))
+        self.comboBox.setObjectName("comboBox")
         self.scrollArea.setWidget(self.scrollAreaWidgetContents)
 
         self.retranslateUi(MainWindow)
