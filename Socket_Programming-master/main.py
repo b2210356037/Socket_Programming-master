@@ -53,11 +53,11 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def setupConnections(self):
         # Connect button clicks to their respective handlers
-        self.ui.pushButton.clicked.connect(self.handlePushButtonClick)
+        self.ui.pushButton.clicked.connect(self.sendMessageToServer)
         # Connect the calendar widget's clicked signal to show_date method
         self.ui.calendarWidget.clicked.connect(self.show_date)
         # Connect button for generating content with AI
-        self.ui.pushButton_2.clicked.connect(self.handlePushButton2Click)
+        self.ui.pushButton_2.clicked.connect(self.sendMessageToAI)
 
     def initializeDateTime(self):
         # Get the current date and time and set them to the widgets
@@ -97,7 +97,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
         QtWidgets.QMessageBox.information(self, "Selected Date", formatted_date)
 
-    def handlePushButtonClick(self):
+    def sendMessageToServer(self):
         # Get the message from the user
         user_message = self.ui.lineEdit_2.text()
 
@@ -140,7 +140,7 @@ class MainWindow(QtWidgets.QMainWindow):
         # Clear the lineEdit widget
         self.ui.lineEdit_2.clear()
 
-    def handlePushButton2Click(self):
+    def sendMessageToAI(self):
         # Chat with AI
         user_prompt = self.ui.lineEdit_2.text()  # Get the message to send to AI from the user
         if user_prompt:
