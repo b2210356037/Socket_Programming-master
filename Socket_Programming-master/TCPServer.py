@@ -33,6 +33,13 @@ def send_to_all_clients(message):
             for client in clients:
                 try:
                     client.send(message.encode())
+                    #send client ip to the firebase
+                    db = firestore.client()
+                    doc_ref = db.collection('server').document('clients')
+                    doc_ref.set({
+                        'ip': client.getpeername()[0]
+                    })
+
                 except Exception as e:
                     print(f"Error sending message to client: {e}")
                     client.close()
