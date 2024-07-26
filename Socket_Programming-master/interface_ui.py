@@ -107,7 +107,7 @@ class Ui_MainWindow(object):
         self.calendarWidget.setDateEditEnabled(True)
         self.calendarWidget.setObjectName("calendarWidget")
         self.comboBox = QtWidgets.QComboBox(self.scrollAreaWidgetContents)
-        self.comboBox.setGeometry(QtCore.QRect(370, 80, 69, 22))
+        self.comboBox.setGeometry(QtCore.QRect(370, 80, 90, 22))
         self.comboBox.setObjectName("comboBox")
         self.scrollArea.setWidget(self.scrollAreaWidgetContents)
 

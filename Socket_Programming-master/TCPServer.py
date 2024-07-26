@@ -20,6 +20,7 @@ clients_lock = threading.Lock()  # Lock for managing clients
 # Function to send messages to clients
 # Function to send messages to all clients
 def send_to_all_clients(message):
+    db = firestore.client()
     with clients_lock:
         if message == "exit":
             for client in clients:
@@ -34,11 +35,10 @@ def send_to_all_clients(message):
                 try:
                     client.send(message.encode())
                     #send client ip to the firebase
-                    db = firestore.client()
+                    
                     doc_ref = db.collection('server').document('clients')
-                    doc_ref.set({
-                        'ip': client.getpeername()[0]
-                    })
+                    doc_ref.update({
+                        'clients': firestore.ArrayUnion([client.getpeername()[0]])})
 
                 except Exception as e:
                     print(f"Error sending message to client: {e}")
@@ -79,6 +79,10 @@ def remove(connection):
     with clients_lock:
         if connection in clients:
             clients.remove(connection)
+            db = firestore.client()
+            doc_ref = db.collection('server').document('clients')
+            doc_ref.update({
+                'clients': firestore.ArrayRemove([connection.getpeername()[0]])})
 
 # Thread function for handling client connections
 def threaded(c, addr):
