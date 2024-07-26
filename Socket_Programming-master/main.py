@@ -15,6 +15,8 @@ from interface_ui import Ui_MainWindow  # Your PyQt5 GUI file name
 from firebaseInitialize import *
 from dotenv import load_dotenv
 from firebase_admin import firestore 
+from datetime import datetime
+from TCPServer import populate_combobox, clients
 
 load_dotenv()
 
@@ -23,6 +25,7 @@ class MainWindow(QtWidgets.QMainWindow):
         super(MainWindow, self).__init__()
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
+        self.ui.comboBox.currentIndexChanged.connect(self.on_combobox_click)
         self.setupConnections()
         self.initializeDateTime()
 
@@ -177,6 +180,12 @@ class MainWindow(QtWidgets.QMainWindow):
             self.model = genai.GenerativeModel('gemini-1.5-pro')
         else:
             QtWidgets.QMessageBox.critical(self, "API Key Error", "GOOGLE_API_KEY environment variable is not set.")
+
+    #on-click combobox
+    def on_combobox_click(self):
+        populate_combobox(self.ui, clients)
+        selected_client = self.ui.comboBox.currentText()
+        QtWidgets.QMessageBox.information(self, "Selected Client", f"Selected client: {selected_client}")
 
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)

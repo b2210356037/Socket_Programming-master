@@ -104,6 +104,11 @@ def send_messages():
         msg = input("Server: ")
         send_to_all_clients(msg)
 
+def populate_combobox(ui, clients):
+    for client in clients:
+        ui.comboBox.addItem(client)
+    
+
 def Main():
     host = ""
     port = 12345
