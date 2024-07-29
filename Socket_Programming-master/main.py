@@ -36,7 +36,7 @@ class MainWindow(QtWidgets.QMainWindow):
     
         # Start TCP connection
         self.client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.client_socket.connect(('192.168.77.10', 12345))
+        self.client_socket.connect(('192.168.43.177', 12345))
 
         self.host_ip = self.client_socket.getsockname()[0]
 
