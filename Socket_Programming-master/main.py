@@ -31,6 +31,8 @@ class MainWindow(QtWidgets.QMainWindow):
         db = firestore.client()
         self.setupConnections(db)
         self.initializeDateTime()
+        # Initialize selected_client_ip
+        self.selected_client_ip = None
 
         # Set the calendar widget to English
         self.ui.calendarWidget.setLocale(QLocale(QLocale.English, QLocale.UnitedStates))
@@ -55,6 +57,8 @@ class MainWindow(QtWidgets.QMainWindow):
         self.configureGenerativeAI()
         #sself.ui.comboBox.activated.connect(self.add_items_combobox)
 
+
+        self.ui.comboBox.currentIndexChanged.connect(self.on_combobox_change)
         self.add_items_combobox(db, self.ui.comboBox)
     
     def setupConnections(self, db):
@@ -108,22 +112,57 @@ class MainWindow(QtWidgets.QMainWindow):
 
         QtWidgets.QMessageBox.information(self, "Selected Date", formatted_date)
 
+    def on_combobox_change(self):
+        # Seçilen IP adresini alın
+        self.selected_client_ip = self.ui.comboBox.currentText()
+
     def sendMessageToServer(self):
+        # Seçilen istemci IP adresini kontrol edin
+        if self.selected_client_ip is None:
+            QtWidgets.QMessageBox.warning(self, "Seçim Yapılmadı", "Lütfen bir istemci seçin.")
+            return
+
         # Get the message from the user
         user_message = self.ui.lineEdit_2.text()
 
         # Add the message to the textEdit widget
         self.ui.textEdit.append(f"{self.host_ip}: {user_message}")
 
-        # Send the message to the TCP server
-        self.client_socket.sendall(f"{self.host_ip}: {user_message}".encode())
+        # Send the message to the selected client via the TCP server
+        message = f"{self.host_ip}: {user_message}"
+        self.client_socket.sendto(message.encode(), (self.selected_client_ip, 12345))
 
         # Clear the lineEdit widget
+        self.ui.lineEdit_2.clear()
+
         # Prepare the log entry
         log_entry = {
             'date': QtCore.QDate.currentDate().toString("yyyy-MM-dd"),
             'log': f"{self.host_ip}: {user_message}"
         }
+
+        # Get the current date as the document ID
+        document_id = QtCore.QDate.currentDate().toString("yyyy-MM-dd")
+
+        # Reference to the document
+        doc_ref = db.collection('logs').document(document_id)
+
+        # Fetch the existing document
+        doc = doc_ref.get()
+        if doc.exists:
+            # Document exists, update the existing log entry
+            existing_data = doc.to_dict()
+            existing_logs = existing_data.get('logs', [])
+            existing_logs.append(log_entry['log'])
+            doc_ref.update({
+                'logs': existing_logs
+            })
+        else:
+            # Document does not exist, create a new document
+            doc_ref.set({
+                'date': log_entry['date'],
+                'logs': [log_entry['log']]
+            })
 
         # Get the current date as the document ID
         document_id = QtCore.QDate.currentDate().toString("yyyy-MM-dd")
