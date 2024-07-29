@@ -17,6 +17,8 @@ from dotenv import load_dotenv
 from firebase_admin import firestore 
 from datetime import datetime
 from TCPServer import clients
+from PyQt5.QtCore import pyqtSignal
+
 
 load_dotenv()
 
@@ -61,6 +63,8 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.calendarWidget.clicked.connect(self.show_date)
         # Connect button for generating content with AI
         self.ui.pushButton_2.clicked.connect(self.sendMessageToAI)
+        # Connect the combobox click event to the on_combobox_click method
+        self.ui.comboBox.view().pressed.connect(lambda: self.add_items_combobox(db, self.ui.comboBox))
 
     def initializeDateTime(self):
         # Get the current date and time and set them to the widgets
@@ -193,13 +197,14 @@ class MainWindow(QtWidgets.QMainWindow):
 
     
     def add_items_combobox(self, db, combobox):
+        # Clear the combobox before adding new items
+        combobox.clear()
         # Get the list of clients from the database
         clients = db.collection('server').document('clients').get().to_dict().get('clients', [])
         for client in clients:
-            #add the client to the combobox
-            self.ui.comboBox.addItem(client)
-        # Connect the combobox click event to the on_combobox_click method
-        #self.ui.comboBox.currentIndexChanged.connect(self.on_combobox_click)
+            # Add the client to the combobox
+            combobox.addItem(client)
+
 
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
