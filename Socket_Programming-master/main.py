@@ -115,25 +115,38 @@ class MainWindow(QtWidgets.QMainWindow):
     def on_combobox_change(self):
         # Seçilen IP adresini alın
         self.selected_client_ip = self.ui.comboBox.currentText()
+        #print("SELECTED: "+ self.selected_client_ip)
 
     def sendMessageToServer(self):
-        # Seçilen istemci IP adresini kontrol edin
         if self.selected_client_ip is None:
-            QtWidgets.QMessageBox.warning(self, "Seçim Yapılmadı", "Lütfen bir istemci seçin.")
+            QtWidgets.QMessageBox.warning(self, "No Client Selected", "Please select a client.")
             return
 
         # Get the message from the user
         user_message = self.ui.lineEdit_2.text()
 
-        # Add the message to the textEdit widget
-        self.ui.textEdit.append(f"{self.host_ip}: {user_message}")
+        # If no message is entered, show a warning
+        if not user_message:
+            QtWidgets.QMessageBox.warning(self, "Empty Message", "Please enter a message.")
+            return
 
         # Send the message to the selected client via the TCP server
         message = f"{self.host_ip}: {user_message}"
-        self.client_socket.sendto(message.encode(), (self.selected_client_ip, 12345))
-
+        
+        # If the selected client is the server itself
+        if self.selected_client_ip == "Server":
+            self.ui.textEdit.append(f"{self.host_ip}: {user_message}")
+        else:
+            try:
+                self.ui.textEdit.append(f"To {self.selected_client_ip}: {user_message}")
+                self.client_socket.send(message.encode())
+                print("Message sent to client: " + self.selected_client_ip)
+            except Exception as e:
+                QtWidgets.QMessageBox.critical(self, "Error", f"Failed to send message: {e}")
+        
         # Clear the lineEdit widget
         self.ui.lineEdit_2.clear()
+
 
         # Prepare the log entry
         log_entry = {
@@ -170,23 +183,6 @@ class MainWindow(QtWidgets.QMainWindow):
         # Reference to the document
         doc_ref = db.collection('logs').document(document_id)
 
-        # Fetch the existing document
-        doc = doc_ref.get()
-        if doc.exists:
-            # Document exists, update the existing log entry
-            existing_data = doc.to_dict()
-            existing_logs = existing_data.get('logs', [])
-            existing_logs.append(log_entry['log'])
-            doc_ref.update({
-                'logs': existing_logs
-            })
-        else:
-            # Document does not exist, create a new document
-            doc_ref.set({
-                'date': log_entry['date'],
-                'logs': [log_entry['log']]
-            })
-
         # Clear the lineEdit widget
         self.ui.lineEdit_2.clear()
 
@@ -208,18 +204,21 @@ class MainWindow(QtWidgets.QMainWindow):
     def receive_messages(self):
         while True:
             try:
-                message = self.client_socket.recv(1024).decode()
+                message, addr = self.client_socket.recvfrom(1024)
+                sender_ip = self.client_socket.getpeername()[0]
+
                 if message:
                     # Add the message to the textEdit widget
-                    # If the sender has the server IP, display the message in red
-                    if self.host_ip == self.client_socket.getsockname()[0]:
+                    if sender_ip == self.host_ip:
                         self.ui.textEdit.append(f"<font color='red'> 'Server': {message}</font>")
                     else:
-                        self.ui.textEdit.append(message)
+                        self.ui.textEdit.append(f"<font color='blue'> {sender_ip}: {message}</font>")
                 else:
                     break
-            except:
+            except Exception as e:
+                QtWidgets.QMessageBox.critical(self, "Error", f"Error receiving message: {e}")
                 break
+
 
     def configureGenerativeAI(self):
         # Configure the API key from environment variables

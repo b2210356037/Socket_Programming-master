@@ -19,6 +19,15 @@ clients_lock = threading.Lock()  # Lock for managing clients
 
 # Function to send messages to clients
 # Function to send messages to all clients
+
+def send_client(message, client):
+        try:
+            client.send(message.encode())
+        except Exception as e:
+            print(f"Error sending message to client: {e}")
+            client.close()
+            remove(client)
+
 def send_to_all_clients(message):
     db = firestore.client()
     with clients_lock:
@@ -98,7 +107,8 @@ def threaded(c, addr):
 
             message = f"Message from {addr}: {data.decode('utf-8')}"
             print(message)
-
+            send_client(message, c)
+            #send_to_all_clients(message, c)
             # Print size of the clients
             with clients_lock:
                 print(f"Number of clients: {len(clients)}")
