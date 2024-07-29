@@ -28,7 +28,8 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
         # Connect the combobox click event to the on_combobox_click method
-        self.setupConnections()
+        db = firestore.client()
+        self.setupConnections(db)
         self.initializeDateTime()
 
         # Set the calendar widget to English
@@ -36,7 +37,7 @@ class MainWindow(QtWidgets.QMainWindow):
     
         # Start TCP connection
         self.client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.client_socket.connect(('192.168.43.177', 12345))
+        self.client_socket.connect(('192.168.77.10', 12345))
 
         self.host_ip = self.client_socket.getsockname()[0]
 
@@ -55,17 +56,19 @@ class MainWindow(QtWidgets.QMainWindow):
         #sself.ui.comboBox.activated.connect(self.add_items_combobox)
 
         self.add_items_combobox(db, self.ui.comboBox)
-
-    def setupConnections(self):
+    
+    def setupConnections(self, db):
         # Connect button clicks to their respective handlers
         self.ui.pushButton.clicked.connect(self.sendMessageToServer)
         # Connect the calendar widget's clicked signal to show_date method
         self.ui.calendarWidget.clicked.connect(self.show_date)
         # Connect button for generating content with AI
         self.ui.pushButton_2.clicked.connect(self.sendMessageToAI)
-        # Connect the combobox click event to the on_combobox_click method
-        self.ui.pushButton_3.clicked.connect(lambda: self.add_items_combobox(db, self.ui.comboBox))
-        self.ui.comboBox.view().pressed.connect(lambda: self.add_items_combobox(db, self.ui.comboBox))
+        # Connect the refresh button to add_items_combobox method
+        self.ui.pushButton_4.clicked.connect(self.refresh_clients)
+
+    def refresh_clients(self):
+        self.add_items_combobox(db, self.ui.comboBox)
 
     def initializeDateTime(self):
         # Get the current date and time and set them to the widgets
@@ -197,23 +200,19 @@ class MainWindow(QtWidgets.QMainWindow):
     #     #QtWidgets.QMessageBox.information(self, "Selected Client", f"Selected client: {selected_client}")
 
     
-    def add_items_combobox(self, db, combobox):
-        # Clear the combobox before adding new items
-        combobox.clear()
-        # Get the list of clients from the database
-        clients = db.collection('server').document('clients').get().to_dict().get('clients', [])
-        for client in clients:
-            # Add the client to the combobox
-            combobox.addItem(client)
+    def add_items_combobox(self, db, comboBox):
+        try:
+            clients = db.collection('server').document('clients').get().to_dict().get('clients', [])
+            comboBox.clear()  # Clear existing items
+            for client in clients:
+                comboBox.addItem(client)
+        except Exception as e:
+            QtWidgets.QMessageBox.critical(self, "Error", f"Error fetching clients: {e}")
 
 
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
     window = MainWindow()
     window.show()
-    db = firestore.client()
-
-    #create instance of the main window
-    window = MainWindow()
-    window.add_items_combobox(db, window.ui.comboBox)
     sys.exit(app.exec_())
+
