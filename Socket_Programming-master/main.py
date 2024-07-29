@@ -64,6 +64,7 @@ class MainWindow(QtWidgets.QMainWindow):
         # Connect button for generating content with AI
         self.ui.pushButton_2.clicked.connect(self.sendMessageToAI)
         # Connect the combobox click event to the on_combobox_click method
+        self.ui.pushButton_3.clicked.connect(lambda: self.add_items_combobox(db, self.ui.comboBox))
         self.ui.comboBox.view().pressed.connect(lambda: self.add_items_combobox(db, self.ui.comboBox))
 
     def initializeDateTime(self):
@@ -170,7 +171,7 @@ class MainWindow(QtWidgets.QMainWindow):
                     # Add the message to the textEdit widget
                     # If the sender has the server IP, display the message in red
                     if self.host_ip == self.client_socket.getsockname()[0]:
-                        self.ui.textEdit.append(f"<font color='red'> Server: {message}</font>")
+                        self.ui.textEdit.append(f"<font color='red'> 'Server': {message}</font>")
                     else:
                         self.ui.textEdit.append(message)
                 else:
