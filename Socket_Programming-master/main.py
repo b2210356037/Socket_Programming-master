@@ -144,19 +144,17 @@ class MainWindow(QtWidgets.QMainWindow):
 
         # Send the message to the selected client via the TCP server
         message = f"{self.selected_client_ip}: {user_message}"
-        sender_ip = self.client_socket.getsockname()[0]
 
-        # If the selected client is the server itself
         if self.selected_client_ip == "Server":
             self.ui.textEdit.append(f"{self.host_ip}: {user_message}")
         else:
             try:
                 self.ui.textEdit.append(f"To {self.selected_client_ip}: {user_message}")
-                self.client_socket.sendall(message.encode('utf-8'), sender_ip)
+                self.client_socket.sendall(message.encode())
                 print("Message sent to client: " + self.selected_client_ip)
             except Exception as e:
                 QtWidgets.QMessageBox.critical(self, "Error", f"Failed to send message: {e}")
-        
+                
         # Clear the lineEdit widget
         self.ui.lineEdit_2.clear()
 
@@ -219,7 +217,6 @@ class MainWindow(QtWidgets.QMainWindow):
             try:
                 message, addr = self.client_socket.recvfrom(1024)
                 sender_ip = self.client_socket.getpeername()[0]
-
                 if message:
                     # Add the message to the textEdit widget
                     # if sender_ip == self.host_ip:
