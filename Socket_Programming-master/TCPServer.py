@@ -23,7 +23,7 @@ def send_client(message, target_ip):
         
         if target_client:
             try:
-                target_client.send(message.encode())
+                target_client.send(message.encode('utf-8'))
             except Exception as e:
                 print(f"Error sending message to client {target_ip}: {e}")
                 target_client.close()
@@ -46,7 +46,7 @@ def send_to_all_clients(message):
         else:
             for addr, client in clients.items():
                 try:
-                    client.send(message.encode())
+                    client.send(message.encode('utf-8'))
                     doc_ref = db.collection('server').document('clients')
                     doc_ref.update({
                         'clients': firestore.ArrayUnion([addr[0]])})
