@@ -11,7 +11,6 @@ import threading
 from PyQt5 import QtWidgets, QtCore
 from PyQt5.QtCore import QLocale
 from interface_ui import Ui_MainWindow  # Your PyQt5 GUI file name
-from interface_ui import Ui_MainWindow  # Your PyQt5 GUI file name
 from firebaseInitialize import *
 from dotenv import load_dotenv
 from firebase_admin import firestore 
@@ -72,7 +71,20 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.pushButton_4.clicked.connect(self.refresh_clients)
 
     def refresh_clients(self):
-        self.add_items_combobox(db, self.ui.comboBox)
+        # Refresh the clients in the combobox via Firestore
+        self.ui.comboBox.clear()
+        db = firestore.client()
+        doc_ref = db.collection('server').document('clients')
+
+        try:
+            doc = doc_ref.get()
+            if doc.exists:
+                clients_data = doc.to_dict().get('clients', [])
+                self.ui.comboBox.addItems(clients_data)
+            else:
+                print("No clients found")
+        except Exception as e:
+            QtWidgets.QMessageBox.critical(self, "Error", f"Error fetching clients: {e}")
 
     def initializeDateTime(self):
         # Get the current date and time and set them to the widgets
@@ -132,14 +144,15 @@ class MainWindow(QtWidgets.QMainWindow):
 
         # Send the message to the selected client via the TCP server
         message = f"{self.selected_client_ip}: {user_message}"
-        
+        sender_ip = self.client_socket.getsockname()[0]
+
         # If the selected client is the server itself
         if self.selected_client_ip == "Server":
             self.ui.textEdit.append(f"{self.host_ip}: {user_message}")
         else:
             try:
                 self.ui.textEdit.append(f"To {self.selected_client_ip}: {user_message}")
-                self.client_socket.sendall(message.encode())
+                self.client_socket.sendall(message.encode('utf-8'), sender_ip)
                 print("Message sent to client: " + self.selected_client_ip)
             except Exception as e:
                 QtWidgets.QMessageBox.critical(self, "Error", f"Failed to send message: {e}")
@@ -209,9 +222,9 @@ class MainWindow(QtWidgets.QMainWindow):
 
                 if message:
                     # Add the message to the textEdit widget
-                    if sender_ip == self.host_ip:
-                        self.ui.textEdit.append(f"<font color='red'> 'Server': {message}</font>")
-                    else:
+                    # if sender_ip == self.host_ip:
+                        # self.ui.textEdit.append(f"<font color='red'> 'Server': {message}</font>")
+                    # else:
                         self.ui.textEdit.append(f"<font color='blue'> {sender_ip}: {message}</font>")
                 else:
                     break
@@ -229,14 +242,6 @@ class MainWindow(QtWidgets.QMainWindow):
             self.model = genai.GenerativeModel('gemini-1.5-pro')
         else:
             QtWidgets.QMessageBox.critical(self, "API Key Error", "GOOGLE_API_KEY environment variable is not set.")
-
-    #on-click combobox
-    # def on_combobox_click(self):
-    #     populate_combobox(self.ui, clients)
-    #     print(self.ui.comboBox.currentText())
-    #     selected_client = self.ui.comboBox.currentText()
-    #     #QtWidgets.QMessageBox.information(self, "Selected Client", f"Selected client: {selected_client}")
-
     
     def add_items_combobox(self, db, comboBox):
         try:
