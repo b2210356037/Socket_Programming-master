@@ -89,7 +89,7 @@ def remove(connection):
 
 def extract_target_ip(message):
     # Define the regex pattern to match the IP address at the start of the message
-    pattern = r'^(\d+\.\d+\.\d+\.\d+):'
+    pattern = r'^(\d+\.\d+\.\d+\.\d+)'
     match = re.search(pattern, message)
     if match:
         return match.group(1)
