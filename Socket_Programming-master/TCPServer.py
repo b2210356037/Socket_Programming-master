@@ -100,6 +100,10 @@ def extract_target_ip(message):
 def threaded(c, addr):
     with clients_lock:
         clients[addr] = c
+        db = firestore.client()
+        doc_ref = db.collection('server').document('clients')
+        doc_ref.update({
+            'clients': firestore.ArrayUnion([addr[0]])})
     while True:
         try:
             data = c.recv(1024)
